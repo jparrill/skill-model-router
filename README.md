@@ -4,6 +4,8 @@ Pi extension that automatically switches to a configured model when a skill is i
 
 Route cheap skills to local models and expensive skills to cloud providers — no manual model switching needed.
 
+![demo](assets/demo.gif)
+
 ## Install
 
 ```bash
@@ -40,9 +42,9 @@ A sample config is included in `skill-models.example.json`.
 ## How it works
 
 1. On `session_start`, loads `skill-models.json` from the Pi agent directory
-2. On `input`, detects `/skill:<name>` invocations and checks the config
+2. On `input`, detects `/name` or `/plugin:name` invocations anywhere in the text and checks the config
 3. If a mapping exists, saves the current model, switches to the target
-4. On `turn_end`, restores the original model
+4. On `turn_end`, `turn_error`, or `session_shutdown`, restores the original model
 
 The status bar shows the current routing state:
 

@@ -101,10 +101,12 @@ export default function skillModelRouter(pi: ExtensionAPI) {
 
 	pi.on("input", async (event, ctx) => {
 		const text = event.text.trim();
-		if (!text.startsWith("/skill:")) return;
+		const match = text.match(/(?:^|\s)\/([a-zA-Z][\w:-]*[\w])/);
+		if (!match) return;
 
-		const skillName = text.replace("/skill:", "").split(/\s/)[0];
-		const spec = config[skillName];
+		const fullName = match[1];
+		const prefix = fullName.split(":")[0];
+		const spec = config[fullName] ?? config[prefix];
 		if (!spec) return;
 
 		const target = resolveModel(spec, ctx);
@@ -136,11 +138,12 @@ export default function skillModelRouter(pi: ExtensionAPI) {
 		}
 	});
 
-	pi.on("turn_end", async (_event, ctx) => {
+	async function restoreModel(ctx: ExtensionContext) {
 		if (!switched || !originalModel) return;
-
-		await pi.setModel(originalModel);
+		const model = originalModel;
 		switched = false;
+		originalModel = undefined;
+		await pi.setModel(model);
 		ctx.ui.setStatus(
 			"skill-router",
 			ctx.ui.theme.fg(
@@ -148,5 +151,17 @@ export default function skillModelRouter(pi: ExtensionAPI) {
 				`router:${Object.keys(config).length} skills`,
 			),
 		);
+	}
+
+	pi.on("turn_end", async (_event, ctx) => {
+		await restoreModel(ctx);
+	});
+
+	pi.on("turn_error", async (_event, ctx) => {
+		await restoreModel(ctx);
+	});
+
+	pi.on("session_shutdown", async (_event, ctx) => {
+		await restoreModel(ctx);
 	});
 }
