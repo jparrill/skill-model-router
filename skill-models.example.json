@@ -1,0 +1,6 @@
+{
+  "worklog-add": "local-moe",
+  "worklog-report": "local-moe",
+  "code-review": "anthropic-vertex/claude-sonnet-4-6",
+  "deep-review": "anthropic-vertex/claude-opus-4-6"
+}

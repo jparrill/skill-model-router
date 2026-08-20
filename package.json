@@ -1,0 +1,23 @@
+{
+  "name": "skill-model-router",
+  "version": "0.1.0",
+  "description": "Pi extension that auto-switches models per skill invocation",
+  "main": "index.ts",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "model-routing",
+    "skill-router"
+  ],
+  "license": "MIT",
+  "author": "Juan Manuel Parrilla <jparrill@users.noreply.github.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jparrill/skill-model-router.git"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": ">=0.80.7",
+    "@earendil-works/pi-coding-agent": ">=0.80.7"
+  }
+}
