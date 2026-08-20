@@ -12,7 +12,11 @@ pi install git:github.com/jparrill/skill-model-router
 
 ## Configure
 
-Create `~/.pi/agent/skill-models.json` mapping skill names to providers or specific models:
+On first run, the extension auto-creates a placeholder config with example entries:
+
+![skill-router first run](https://raw.githubusercontent.com/jparrill/skill-model-router/main/assets/first-run.png)
+
+Edit `~/.pi/agent/skill-models.json` to map skill names to providers or specific models:
 
 ```jsonc
 {
