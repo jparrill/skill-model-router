@@ -16,6 +16,9 @@
     "type": "git",
     "url": "https://github.com/jparrill/skill-model-router.git"
   },
+  "pi": {
+    "extensions": ["index.ts"]
+  },
   "peerDependencies": {
     "@earendil-works/pi-ai": ">=0.80.7",
     "@earendil-works/pi-coding-agent": ">=0.80.7"
