@@ -4,10 +4,10 @@
  * Automatically switches to a configured model when specific skills are invoked,
  * then restores the original model when the turn ends.
  *
- * Config: ~/.pi/agent/skill-models.json
+ * Config: ~/.pi/agent/skill-models.json (auto-created on first run)
  * {
- *   "worklog-add": "auriga-moe",
- *   "worklog-report": "auriga-moe/Qwen3.6-35B-A3B-Q8_0.gguf"
+ *   "worklog-add": "local-provider",
+ *   "code-review": "cloud-provider/model-id"
  * }
  *
  * Values can be:
@@ -15,7 +15,7 @@
  *   - "provider/model-id"   — uses a specific model
  */
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Model, Api } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -25,11 +25,36 @@ interface SkillModelsConfig {
 	[skillName: string]: string;
 }
 
+const PLACEHOLDER: SkillModelsConfig = {
+	"example-skill": "local-provider",
+	"example-review": "cloud-provider/model-id",
+};
+
+function getConfigPath(): string {
+	return join(getAgentDir(), "skill-models.json");
+}
+
+function seedConfig(): void {
+	writeFileSync(
+		getConfigPath(),
+		JSON.stringify(PLACEHOLDER, null, 2) + "\n",
+	);
+}
+
 function loadConfig(): SkillModelsConfig {
-	const configPath = join(getAgentDir(), "skill-models.json");
-	if (!existsSync(configPath)) return {};
+	const path = getConfigPath();
+	if (!existsSync(path)) return {};
 	try {
-		return JSON.parse(readFileSync(configPath, "utf-8"));
+		const config = JSON.parse(readFileSync(path, "utf-8"));
+		const keys = Object.keys(config).filter(
+			(k) => !k.startsWith("example-"),
+		);
+		if (keys.length === 0) return {};
+		return Object.fromEntries(
+			Object.entries(config).filter(
+				([k]) => !k.startsWith("example-"),
+			),
+		);
 	} catch {
 		return {};
 	}
@@ -55,6 +80,15 @@ export default function skillModelRouter(pi: ExtensionAPI) {
 	let switched = false;
 
 	pi.on("session_start", async (_event, ctx) => {
+		if (!existsSync(getConfigPath())) {
+			seedConfig();
+			ctx.ui.notify(
+				"skill-router: created ~/.pi/agent/skill-models.json — edit it to configure routing",
+				"info",
+			);
+			return;
+		}
+
 		config = loadConfig();
 		const count = Object.keys(config).length;
 		if (count > 0) {
