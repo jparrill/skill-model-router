@@ -4,6 +4,8 @@ Pi extension that automatically switches to a configured model when a skill is i
 
 Route cheap skills to local models and expensive skills to cloud providers — no manual model switching needed.
 
+![demo](assets/demo.gif)
+
 ## Install
 
 ```bash
